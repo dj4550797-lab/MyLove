@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Akshara Love Studio ❤️ | Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #ff4d88;
+      --primary-hover: #e03370;
+      --bg: #fdf8fa;
+      --surface: #ffffff;
+      --border: #f2e3eb;
+      --text-main: #331e2b;
+      --text-muted: #7d6574;
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #auth-modal {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #ffffff 0%, #fde8f1 100%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .auth-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: clamp(24px, 6vw, 36px) clamp(20px, 5vw, 28px);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(255, 77, 136, 0.14);
+    }
+
+    .auth-box h2 {
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .auth-box input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      margin: 16px 0;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      outline: none;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px clamp(14px, 3vw, 24px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: clamp(1rem, 3.2vw, 1.2rem);
+      color: var(--primary);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 9px 16px;
+      min-height: 40px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-magic { background: #8b5cf6; color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
+    .btn-magic:hover { background: #7c3aed; }
+    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-danger { background: var(--danger-bg); color: var(--danger); }
+    .btn-danger:hover { background: #fecaca; }
+
+    .container {
+      max-width: 1080px;
+      width: 100%;
+      margin: clamp(12px, 3vw, 20px) auto;
+      padding: 0 clamp(12px, 3vw, 18px);
+      flex: 1;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: #f4e7ef;
+      padding: 5px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      padding: 9px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+
+    .tab-btn.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(18px, 4vw, 24px);
+      margin-bottom: 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .sticker-preview-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #faf4f7;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .sticker-preview-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #fdf2f7;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge-yes { background: #dcfce7; color: #15803d; padding: 4px 9px; border-radius: 999px; font-weight: 600; font-size: 0.78rem; }
+    .badge-no { background: #fee2e2; color: #b91c1c; padding: 4px 9px; border-radius: 999px; font-weight: 600; font-size: 0.78rem; }
+    .badge-dodge { background: #fef3c7; color: #b45309; padding: 4px 9px; border-radius: 999px; font-weight: 600; font-size: 0.78rem; }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2b1824;
+      color: #fff;
+      padding: 11px 20px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.25s ease;
+      z-index: 2000;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="auth-modal">
+    <div class="auth-box">
+      <h2>Akshara Love Studio ❤️</h2>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Enter PIN to manage website & generate magic links</p>
+      <input type="password" id="pin-input" placeholder="PIN (Default: 1430)" maxlength="8" />
+      <button class="btn btn-primary" id="btn-login" style="width:100%;">Unlock Studio ✨</button>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">Love Studio ❤️</div>
+    <div class="top-actions">
+      <!-- Magic Share Link Button for Cross-Device Sync -->
+      <button class="btn btn-magic" id="btn-copy-magic-link" title="Generate Shareable Link with your custom messages">Copy Link For Akshara 🔗</button>
+      <a href="index.html" target="_blank" class="btn btn-outline" style="font-size:0.82rem; padding:8px 12px;">Preview ↗</a>
+      <button class="btn btn-primary" id="btn-save-all" style="font-size:0.82rem; padding:8px 12px;">Save 💾</button>
+      <button class="btn btn-outline" id="btn-lock" style="font-size:0.82rem; padding:8px 12px;">Lock</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="clicks">👀 What She Pressed</button>
+      <button class="tab-btn" data-tab="pleadings">🥺 5 Pleading Stages</button>
+      <button class="tab-btn" data-tab="general">✍️ Welcome & Thank You</button>
+      <button class="tab-btn" data-tab="stickers">🐱 Stickers & Music</button>
+      <button class="tab-btn" data-tab="manage">🗑️ Data Delete & Reset</button>
+    </div>
+
+    <!-- TAB 1: Live Click History -->
+    <section class="panel active" id="tab-clicks">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3>📋 Real-Time Activity Log</h3>
+          <button class="btn btn-danger" id="btn-clear-logs" style="font-size:0.8rem; padding:6px 12px;">🗑️ Delete All Logs</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Time & Date</th>
+                <th>Exact Button / Action Clicked</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No interactions recorded yet. Open index.html and test!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: The 5 Pleading Stages -->
+    <section class="panel" id="tab-pleadings">
+      <div class="card">
+        <h3>🥺 The 5 Sequential Pleading Stages</h3>
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:14px;">
+          When Akshara clicks NO, she sees these messages one by one. On Stage 5, the NO button dodges smoothly so she clicks YES!
+        </p>
+
+        <div class="form-group">
+          <label>Stage 1 Message (First NO response)</label>
+          <input type="text" id="cfg-plead-0" />
+        </div>
+        <div class="form-group">
+          <label>Stage 2 Message</label>
+          <input type="text" id="cfg-plead-1" />
+        </div>
+        <div class="form-group">
+          <label>Stage 3 Message</label>
+          <input type="text" id="cfg-plead-2" />
+        </div>
+        <div class="form-group">
+          <label>Stage 4 Message</label>
+          <input type="text" id="cfg-plead-3" />
+        </div>
+        <div class="form-group">
+          <label>Stage 5 Message (Final Pleading — NO runs away here!)</label>
+          <input type="text" id="cfg-plead-4" />
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Welcome & Celebration Editor -->
+    <section class="panel" id="tab-general">
+      <div class="card">
+        <h3>1. Recipient & Welcome Screen</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Recipient Name</label>
+            <input type="text" id="cfg-name" value="Akshara" />
+          </div>
+          <div class="form-group">
+            <label>Welcome Heading</label>
+            <input type="text" id="cfg-welcome-heading" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Welcome Subtitle</label>
+          <textarea id="cfg-welcome-sub" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Initial Romantic Question</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Heading</label>
+            <input type="text" id="cfg-init-heading" />
+          </div>
+          <div class="form-group">
+            <label>Question Subtitle</label>
+            <input type="text" id="cfg-init-sub" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3. Thank You Celebration & Love Letter (Boyfriend can edit!)</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Thank You Heading (Shown on YES)</label>
+            <input type="text" id="cfg-final-heading" />
+          </div>
+          <div class="form-group">
+            <label>Celebration Subtitle</label>
+            <input type="text" id="cfg-final-sub" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Personal Thank You Love Letter (Supports emojis & Hindi text)</label>
+          <textarea id="cfg-final-letter" rows="5"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Stickers & Music with Smart Giphy Converter & Gboard Paste -->
+    <section class="panel" id="tab-stickers">
+      <div class="card">
+        <h3>Assign Sticker / GIF (Supports Giphy links, Emojis & Paste)</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Target Screen / Stage</label>
+            <select id="sticker-target-stage">
+              <option value="welcome">Welcome Screen</option>
+              <option value="initial">Initial Question Screen</option>
+              <option value="plead_0">Pleading Stage 1</option>
+              <option value="plead_1">Pleading Stage 2</option>
+              <option value="plead_2">Pleading Stage 3</option>
+              <option value="plead_3">Pleading Stage 4</option>
+              <option value="plead_4">Pleading Stage 5 (Forever)</option>
+              <option value="celebration">Thank You Celebration Screen ❤️</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Choose Built-in 0-Lag Sticker</label>
+            <select id="sticker-preset-select">
+              <option value="loveCat">Cat Holding Heart</option>
+              <option value="pleadCat">Cat Pleading with Big Eyes</option>
+              <option value="cryingCat">Cat Crying Tears</option>
+              <option value="sadCat">Sad Cat with Broken Heart</option>
+              <option value="celebrateCat">Party Celebrate Cat</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-outline" id="btn-apply-preset-sticker" style="margin-bottom:16px;">Apply Built-in Sticker</button>
+
+        <div style="margin-top: 10px;">
+          <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Paste ANY Giphy Link or Direct Image URL (Auto-Converted ✨)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="sticker-url-input" placeholder="e.g. https://giphy.com/stickers/sad-cat-crying-a6TvNMFAJqfTOAGjz4" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:16px;" />
+            <button class="btn btn-primary" id="btn-apply-url-sticker">Apply GIF</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Or Paste Gboard Emojis (Supports multi-emojis like 🥺😭💔🥀)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="sticker-emoji-input" placeholder="Type or paste emojis with Gboard" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:10px; font-size:16px;" />
+            <button class="btn btn-outline" id="btn-apply-emoji-sticker">Apply Emoji</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Current Stickers in Use & Delete Options</h3>
+        <div id="stickers-current-list"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3>Background Music Track</h3>
+          <button class="btn btn-danger" id="btn-delete-music" style="font-size:0.75rem; padding:4px 10px;">Clear Music</button>
+        </div>
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">Music starts automatically when she clicks "Open Surprise 🌸".</p>
+        <div class="form-group">
+          <label>Audio Stream URL (MP3)</label>
+          <input type="text" id="cfg-music-url" />
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: Comprehensive Data Deletion & Factory Reset -->
+    <section class="panel" id="tab-manage">
+      <div class="card">
+        <h3 style="color:var(--danger);">🗑️ Danger Zone: Data Delete & Reset</h3>
+        <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:18px;">
+          Yahan se aap user logs delete kar sakte hain, custom stickers hata sakte hain, ya poori website ko clean factory state me laa sakte hain.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px;">
+            <div>
+              <strong>Delete All Interaction History</strong>
+              <p style="font-size:0.8rem; color:var(--text-muted);">Akshara ne kya-kya click kiya tha, saara record clean ho jayega.</p>
+            </div>
+            <button class="btn btn-danger" id="btn-delete-all-logs-direct">Delete Logs</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border); border-radius:12px;">
+            <div>
+              <strong>Reset All Custom Stickers to Default</strong>
+              <p style="font-size:0.8rem; color:var(--text-muted);">Saare screens par wapas pyare built-in animated cats lag jayenge.</p>
+            </div>
+            <button class="btn btn-outline" id="btn-reset-stickers-only">Reset Stickers</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid #fecaca; background:#fff5f5; border-radius:12px;">
+            <div>
+              <strong style="color:var(--danger);">Factory Reset (Delete Everything)</strong>
+              <p style="font-size:0.8rem; color:var(--text-muted);">Saare custom messages, music, aur click logs delete ho jayenge.</p>
+            </div>
+            <button class="btn btn-danger" id="btn-factory-reset">Reset Everything</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast">Saved successfully! ❤️</div>
+
+  <script>
+    const CONFIG_KEY = 'akshara_love_config_v1';
+    const LOGS_KEY = 'akshara_love_clicks_v1';
+
+    function normalizeStickerUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      url = url.trim();
+
+      const giphyMatch = url.match(/giphy\.com\/(?:stickers|gifs)\/(?:[\w-]+-)?([a-zA-Z0-9]+)/);
+      if (giphyMatch && giphyMatch[1]) {
+        return `https://i.giphy.com/media/${giphyMatch[1]}/giphy.gif`;
+      }
+
+      const giphyMediaMatch = url.match(/giphy\.com\/media\/([a-zA-Z0-9]+)/);
+      if (giphyMediaMatch && giphyMediaMatch[1]) {
+        return `https://i.giphy.com/media/${giphyMediaMatch[1]}/giphy.gif`;
+      }
+
+      return url;
+    }
+
+    const DEFAULT_CONFIG = {
+      names: { recipient: "Akshara", sender: "Someone who loves you" },
+      welcome: {
+        heading: "Hey Akshara! ❤️",
+        subtitle: "I prepared a little surprise straight from my heart...",
+        buttonText: "Open Surprise 🌸",
+        sticker: "loveCat"
+      },
+      initialQuestion: {
+        heading: "Akshara, can I ask you something?",
+        subtitle: "Do you love me? ❤️",
+        yesBtn: "YES ❤️",
+        noBtn: "NO 🙈",
+        sticker: "pleadCat"
+      },
+      pleadings: [
+        { text: "Please don't say no... 🥺 Please click YES na!", sticker: "pleadCat", anim: "anim-bounce" },
+        { text: "Do you really not love me? My heart is breaking... 💔", sticker: "sadCat", anim: "anim-float" },
+        { text: "Please don't leave me... Look how much I care! 😭❤️", sticker: "cryingCat", anim: "anim-pulse" },
+        { text: "Ek baar aur soch lo na please? Look into my eyes... 🥺🌸", sticker: "pleadCat", anim: "anim-bounce" },
+        { text: "One last time... Will you stay with me forever? ❤️", sticker: "loveCat", anim: "anim-pulse" }
+      ],
+      finalCelebration: {
+        heading: "I KNEW IT!!! ❤️🎉",
+        subtitle: "I love you so, so much, Akshara!",
+        letter: "Dear Akshara,\n\nThank you for choosing me and making my world so beautiful. Every smile of yours means everything to me. I promise to cherish you, protect your happiness, and stay by your side forever.\n\nForever & always yours ❤️",
+        sticker: "celebrateCat"
+      },
+      settings: {
+        musicUrl: "https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverending_Story.mp3"
+      }
+    };
+
+    let activeConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    // Unicode Base64 Encoder (supports Hindi and emojis)
+    function encodeMagicData(obj) {
+      const jsonStr = JSON.stringify(obj);
+      return btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+      }));
+    }
+
+    // Generate Shareable Link for Akshara
+    document.getElementById('btn-copy-magic-link').addEventListener('click', () => {
+      saveInputsToConfig(); // Save first
+
+      const encoded = encodeMagicData(activeConfig);
+      let baseUrl = window.location.href.split('admin.html')[0];
+      if (!baseUrl.endsWith('/')) baseUrl += '/';
+      const shareUrl = `${baseUrl}index.html#love=${encoded}`;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Magic Link Copied! Akshara ko WhatsApp par send karein 💌");
+      }).catch(() => {
+        prompt("Copy this Magic Link for Akshara:", shareUrl);
+      });
+    });
+
+    // Authentication
+    const authModal = document.getElementById('auth-modal');
+    const pinInput = document.getElementById('pin-input');
+
+    document.getElementById('btn-login').addEventListener('click', () => {
+      if (pinInput.value.trim() === '1430' || pinInput.value.trim() === '') {
+        sessionStorage.setItem('admin_auth', 'true');
+        authModal.style.display = 'none';
+        initAdminUI();
+      } else {
+        alert('Invalid PIN. Default PIN is 1430.');
+      }
+    });
+
+    document.getElementById('btn-lock').addEventListener('click', () => {
+      sessionStorage.removeItem('admin_auth');
+      authModal.style.display = 'flex';
+    });
+
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+      authModal.style.display = 'none';
+      initAdminUI();
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+        if (btn.getAttribute('data-tab') === 'clicks') renderLogs();
+        if (btn.getAttribute('data-tab') === 'stickers') renderStickersList();
+      });
+    });
+
+    function initAdminUI() {
+      try {
+        const stored = localStorage.getItem(CONFIG_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          activeConfig = {
+            names: { ...DEFAULT_CONFIG.names, ...(parsed.names || {}) },
+            welcome: { ...DEFAULT_CONFIG.welcome, ...(parsed.welcome || {}) },
+            initialQuestion: { ...DEFAULT_CONFIG.initialQuestion, ...(parsed.initialQuestion || {}) },
+            pleadings: (parsed.pleadings && parsed.pleadings.length === 5) ? parsed.pleadings : DEFAULT_CONFIG.pleadings,
+            finalCelebration: { ...DEFAULT_CONFIG.finalCelebration, ...(parsed.finalCelebration || {}) },
+            settings: { ...DEFAULT_CONFIG.settings, ...(parsed.settings || {}) }
+          };
+        }
+      } catch (e) {}
+
+      document.getElementById('cfg-name').value = activeConfig.names.recipient;
+      document.getElementById('cfg-welcome-heading').value = activeConfig.welcome.heading;
+      document.getElementById('cfg-welcome-sub').value = activeConfig.welcome.subtitle;
+      document.getElementById('cfg-init-heading').value = activeConfig.initialQuestion.heading;
+      document.getElementById('cfg-init-sub').value = activeConfig.initialQuestion.subtitle;
+      document.getElementById('cfg-final-heading').value = activeConfig.finalCelebration.heading;
+      document.getElementById('cfg-final-sub').value = activeConfig.finalCelebration.subtitle;
+      document.getElementById('cfg-final-letter').value = activeConfig.finalCelebration.letter;
+
+      for (let i = 0; i < 5; i++) {
+        document.getElementById(`cfg-plead-${i}`).value = activeConfig.pleadings[i].text;
+      }
+
+      document.getElementById('cfg-music-url').value = activeConfig.settings.musicUrl || DEFAULT_CONFIG.settings.musicUrl;
+
+      renderLogs();
+      renderStickersList();
+    }
+
+    function saveInputsToConfig() {
+      activeConfig.names.recipient = document.getElementById('cfg-name').value.trim() || 'Akshara';
+      activeConfig.welcome.heading = document.getElementById('cfg-welcome-heading').value;
+      activeConfig.welcome.subtitle = document.getElementById('cfg-welcome-sub').value;
+      activeConfig.initialQuestion.heading = document.getElementById('cfg-init-heading').value;
+      activeConfig.initialQuestion.subtitle = document.getElementById('cfg-init-sub').value;
+      activeConfig.finalCelebration.heading = document.getElementById('cfg-final-heading').value;
+      activeConfig.finalCelebration.subtitle = document.getElementById('cfg-final-sub').value;
+      activeConfig.finalCelebration.letter = document.getElementById('cfg-final-letter').value;
+
+      for (let i = 0; i < 5; i++) {
+        activeConfig.pleadings[i].text = document.getElementById(`cfg-plead-${i}`).value;
+      }
+
+      activeConfig.settings.musicUrl = document.getElementById('cfg-music-url').value.trim();
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(activeConfig));
+    }
+
+    document.getElementById('btn-save-all').addEventListener('click', () => {
+      saveInputsToConfig();
+      showToast('Changes saved and live! ❤️');
+      renderStickersList();
+    });
+
+    function applySticker(target, src) {
+      const normalizedSrc = normalizeStickerUrl(src);
+
+      if (target === 'welcome') {
+        activeConfig.welcome.sticker = normalizedSrc;
+      } else if (target === 'initial') {
+        activeConfig.initialQuestion.sticker = normalizedSrc;
+      } else if (target === 'celebration') {
+        activeConfig.finalCelebration.sticker = normalizedSrc;
+      } else if (target.startsWith('plead_')) {
+        const idx = parseInt(target.split('_')[1], 10);
+        activeConfig.pleadings[idx].sticker = normalizedSrc;
+      }
+
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(activeConfig));
+      showToast('Sticker/GIF updated successfully! 🐱');
+      renderStickersList();
+    }
+
+    document.getElementById('btn-apply-preset-sticker').addEventListener('click', () => {
+      const target = document.getElementById('sticker-target-stage').value;
+      const preset = document.getElementById('sticker-preset-select').value;
+      applySticker(target, preset);
+    });
+
+    document.getElementById('btn-apply-emoji-sticker').addEventListener('click', () => {
+      const target = document.getElementById('sticker-target-stage').value;
+      const emoji = document.getElementById('sticker-emoji-input').value.trim();
+      if (!emoji) return alert('Please enter emojis.');
+      applySticker(target, emoji);
+      document.getElementById('sticker-emoji-input').value = '';
+    });
+
+    document.getElementById('btn-apply-url-sticker').addEventListener('click', () => {
+      const target = document.getElementById('sticker-target-stage').value;
+      const rawUrl = document.getElementById('sticker-url-input').value.trim();
+      if (!rawUrl) return alert('Please paste an image or Giphy URL.');
+      applySticker(target, rawUrl);
+      document.getElementById('sticker-url-input').value = '';
+    });
+
+    function renderStickersList() {
+      const container = document.getElementById('stickers-current-list');
+      if (!container) return;
+
+      const items = [
+        { label: "Welcome Screen", key: "welcome", val: activeConfig.welcome.sticker, defaultVal: DEFAULT_CONFIG.welcome.sticker },
+        { label: "Initial Question", key: "initial", val: activeConfig.initialQuestion.sticker, defaultVal: DEFAULT_CONFIG.initialQuestion.sticker },
+        { label: "Pleading Stage 1", key: "plead_0", val: activeConfig.pleadings[0].sticker, defaultVal: DEFAULT_CONFIG.pleadings[0].sticker },
+        { label: "Pleading Stage 2", key: "plead_1", val: activeConfig.pleadings[1].sticker, defaultVal: DEFAULT_CONFIG.pleadings[1].sticker },
+        { label: "Pleading Stage 3", key: "plead_2", val: activeConfig.pleadings[2].sticker, defaultVal: DEFAULT_CONFIG.pleadings[2].sticker },
+        { label: "Pleading Stage 4", key: "plead_3", val: activeConfig.pleadings[3].sticker, defaultVal: DEFAULT_CONFIG.pleadings[3].sticker },
+        { label: "Pleading Stage 5", key: "plead_4", val: activeConfig.pleadings[4].sticker, defaultVal: DEFAULT_CONFIG.pleadings[4].sticker },
+        { label: "Thank You Screen", key: "celebration", val: activeConfig.finalCelebration.sticker, defaultVal: DEFAULT_CONFIG.finalCelebration.sticker },
+      ];
+
+      container.innerHTML = '';
+      items.forEach(item => {
+        const isUrl = item.val && (item.val.startsWith('http') || item.val.startsWith('data:'));
+        const row = document.createElement('div');
+        row.className = 'sticker-preview-row';
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            ${isUrl ? `<img src="${item.val}" class="sticker-preview-thumb" onerror="this.src='https://via.placeholder.com/50?text=Sticker'" />` : `<span style="font-size:2rem;">${item.val}</span>`}
+            <div>
+              <strong>${item.label}</strong>
+              <p style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;">${item.val}</p>
+            </div>
+          </div>
+          <button class="btn btn-danger" style="font-size:0.75rem; padding:5px 10px;" onclick="deleteSingleSticker('${item.key}', '${item.defaultVal}')">Reset / Delete</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    window.deleteSingleSticker = function(key, defaultVal) {
+      applySticker(key, defaultVal);
+      showToast('Sticker reset to default!');
+    };
+
+    document.getElementById('btn-delete-music').addEventListener('click', () => {
+      if (confirm('Clear background music track?')) {
+        document.getElementById('cfg-music-url').value = '';
+        activeConfig.settings.musicUrl = '';
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(activeConfig));
+        showToast('Music cleared!');
+      }
+    });
+
+    function renderLogs() {
+      const tbody = document.getElementById('logs-tbody');
+      let logs = [];
+      try {
+        const raw = localStorage.getItem(LOGS_KEY);
+        if (raw) logs = JSON.parse(raw);
+      } catch (e) {}
+
+      if (!logs.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No interactions recorded yet. Open index.html and test!</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      logs.forEach((item, index) => {
+        let badgeClass = 'badge-yes';
+        let badgeText = 'YES Clicked';
+        if (item.action.includes('NO')) {
+          badgeClass = 'badge-no';
+          badgeText = 'NO Clicked';
+        } else if (item.action.includes('Dodged')) {
+          badgeClass = 'badge-dodge';
+          badgeText = 'Dodge Triggered';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.time}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${item.date || ''}</span></td>
+          <td>${item.action}</td>
+          <td><span class="${badgeClass}">${badgeText}</span></td>
+          <td><button class="btn btn-danger" style="font-size:0.72rem; padding:4px 8px;" onclick="deleteSingleLog(${index})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.deleteSingleLog = function(idx) {
+      let logs = [];
+      try {
+        const raw = localStorage.getItem(LOGS_KEY);
+        if (raw) logs = JSON.parse(raw);
+      } catch (e) {}
+      logs.splice(idx, 1);
+      localStorage.setItem(LOGS_KEY, JSON.stringify(logs));
+      renderLogs();
+      showToast('Log entry deleted!');
+    };
+
+    function clearAllLogs() {
+      if (confirm('Are you sure you want to delete ALL activity logs?')) {
+        localStorage.removeItem(LOGS_KEY);
+        renderLogs();
+        showToast('All logs deleted!');
+      }
+    }
+
+    document.getElementById('btn-clear-logs').addEventListener('click', clearAllLogs);
+    document.getElementById('btn-delete-all-logs-direct').addEventListener('click', clearAllLogs);
+
+    document.getElementById('btn-reset-stickers-only').addEventListener('click', () => {
+      if (confirm('Reset all screen stickers back to animated cats?')) {
+        activeConfig.welcome.sticker = DEFAULT_CONFIG.welcome.sticker;
+        activeConfig.initialQuestion.sticker = DEFAULT_CONFIG.initialQuestion.sticker;
+        for (let i = 0; i < 5; i++) {
+          activeConfig.pleadings[i].sticker = DEFAULT_CONFIG.pleadings[i].sticker;
+        }
+        activeConfig.finalCelebration.sticker = DEFAULT_CONFIG.finalCelebration.sticker;
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(activeConfig));
+        renderStickersList();
+        showToast('All stickers reset to default!');
+      }
+    });
+
+    document.getElementById('btn-factory-reset').addEventListener('click', () => {
+      if (confirm('WARNING: This will delete ALL custom messages, custom music, and logs, restoring factory defaults. Continue?')) {
+        localStorage.removeItem(CONFIG_KEY);
+        localStorage.removeItem(LOGS_KEY);
+        activeConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        initAdminUI();
+        showToast('Factory reset complete!');
+      }
+    });
+
+    setInterval(() => {
+      if (document.getElementById('tab-clicks').classList.contains('active')) {
+        renderLogs();
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
